@@ -23,7 +23,8 @@ for i in range(len(filepath)):
         #write your code here
     elif i == 5:
         print(filepath[i]+': PIOTER')
-        # write your code here
+        df_avia_pa = pd.read_csv(filepath[i])
+        print(df_avia_pa.head())
     elif i == 6:
         print(filepath[i]+': ZACHOS')
         # write your code here
@@ -32,8 +33,10 @@ for i in range(len(filepath)):
         # write your code here
     elif i == 8:
         print(filepath[i]+': PIOTER')
-        # write your code here
+        df_mar_pa = pd.read_csv(filepath[i],sep='\t')
+        print(df_mar_pa.head())
     elif i == 9:
         print(filepath[i]+': PIOTER')
-        # write your code here
+        df_rail_pa = pd.read_csv(filepath[i])
+        print(df_rail_pa.head())
 
