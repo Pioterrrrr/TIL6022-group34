@@ -30,6 +30,7 @@ for i in range(len(filepath)):
         # write your code here
     elif i == 7:
         print(filepath[i]+': VASILIS')
+        # Import pycountry--> pip install pycountry (used to change 2-code to full name of country)
         # write your code here
     elif i == 8:
         print(filepath[i]+': PIOTER')
