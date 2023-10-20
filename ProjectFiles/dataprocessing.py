@@ -1,6 +1,7 @@
 import pandas as pd
 import os
-datadir = 'data/'
+pydir = os.path.dirname(__file__)
+datadir = pydir+'\\data\\'
 datalist = os.listdir(datadir)
 filepath = []
 
@@ -13,7 +14,7 @@ filepath = []
 
 for file in datalist:
     print(file)
-    filepath.append('data/' + file)
+    filepath.append(pydir + '\\data\\' + file)
 
 print(filepath)
 
@@ -48,7 +49,6 @@ for i in range(len(filepath)):
         df_rail_pa = pd.read_csv(filepath[i])
         rail_countries = df_rail_pa['geo'].unique()
         df_rail_pa_relevant = df_rail_pa.iloc[:, 4:7]
-        print(df_rail_pa_relevant.columns[2])
         df_rail_pa_relevant = df_rail_pa_relevant.rename({
             'geo': 'Geo', 'TIME_PERIOD': 'Time_period', 'OBS_VALUE': 'Passengers_count'
         }, axis='columns')
