@@ -21,6 +21,7 @@ for i in range(len(filepath)):
     if i<=4:
         print(filepath[i]+': NISZO+DAVIDE')
         #write your code here
+        # needed actions: sort data (per ship type) -> save
     elif i == 5:
         print(filepath[i]+': PIOTER')
         # write your code here
