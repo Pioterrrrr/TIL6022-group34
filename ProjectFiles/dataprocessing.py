@@ -44,6 +44,18 @@ for i in range(len(filepath)):
         },axis='columns')
         print(df_edgar_relevant)
         
+        #Pre-Processing if we use emissions per category (normalized): 
+        df_edgar_categories = pd.read_excel(filepath[i], sheet_name=sheet_name)
+        df_edgar_categories = df_edgar_categories.iloc[1450:1458,51:57]
+        df_edgar_categories = df_edgar_categories.apply(lambda row: (row) / (row.max()), axis=1)
+
+        df_edgar_categories_norm = df_edgar_categories.reset_index(drop=True)
+        custom_index_names = ["Agriculture", "Buildings", "Fuel Exploitation", 
+                              "Industrial Combustion", "Power Industry", "Processes","Transport", "Waste"
+                             ] 
+        df_edgar_categories_norm.index = custom_index_names
+        print(df_edgar_categories_norm)
+        
     elif i == 7:
         print(filepath[i]+': VASILIS')
         # write your code here
