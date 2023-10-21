@@ -50,6 +50,7 @@ for i in range(len(filepath)):
         df_edgar_categories = df_edgar_categories.apply(lambda row: (row) / (row.max()), axis=1)
 
         df_edgar_categories_norm = df_edgar_categories.reset_index(drop=True)
+        
         custom_index_names = ["Agriculture", "Buildings", "Fuel Exploitation", 
                               "Industrial Combustion", "Power Industry", "Processes","Transport", "Waste"
                              ] 
