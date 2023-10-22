@@ -16,7 +16,7 @@ for file in datalist:
     print(file)
     filepath.append(pydir + '\\data\\' + file)
 
-print(filepath)
+# print(filepath)
 
 for i in range(len(filepath)):
     if i<=4:
@@ -41,8 +41,8 @@ for i in range(len(filepath)):
     elif i == 8:
         print(filepath[i]+': PIOTER')
         # passenger count in thousands of passengers, from 2017 (columns go to 1997, but with no data)
-        df_mar_pa = pd.read_csv(filepath[i],sep='\t')
-        print(df_mar_pa.columns)
+        df_mar_pa = pd.read_csv(filepath[i])
+        print(df_mar_pa.head())
     elif i == 9:
         print(filepath[i]+': PIOTER')
         # passenger count in thousands of passengers, from 2004
@@ -52,5 +52,5 @@ for i in range(len(filepath)):
         df_rail_pa_relevant = df_rail_pa_relevant.rename({
             'geo': 'Geo', 'TIME_PERIOD': 'Time_period', 'OBS_VALUE': 'Passengers_count'
         }, axis='columns')
-        print(df_rail_pa_relevant.head())
+        # print(df_rail_pa_relevant.head())
 
