@@ -9,13 +9,6 @@ datadir = pydir + '\\data\\'
 datalist = os.listdir(datadir)
 filepath = []
 
-# if filepath.endswith('xlsx'):
-# df = pd.read_excel(filepath)
-# elif filepath.endswith('csv'):
-# df = pd.read_csv(filepath)
-# else #tsv files
-# df = pd.read_csv(filepath,sep='\t')
-
 warnings.filterwarnings("ignore", message="Workbook contains no default style, apply openpyxl's default")
 
 for file in datalist:
@@ -82,9 +75,9 @@ for i in range(len(filepath)):
         co2 = co2.pivot(index=co2.columns[0], columns=co2.columns[1], values=co2.columns[2])
         time = time.pivot(index=time.columns[0], columns=time.columns[1], values=time.columns[2])
 
-        print(co2)
-        print(time)
-        print(co2_tot)
+        # print(co2)
+        # print(time)
+        # print(co2_tot)
 
     elif i == 5:
         # print(filepath[i]+': PIOTR PIETRZAK')
@@ -121,8 +114,11 @@ for i in range(len(filepath)):
                                            in df_avia_pa_relevant.itertuples(index=False)]
 
         # print(df_avia_pa_relevant)
+        df_avia_path = pydir + '\\DATA_PROCESSED\\df_passengers_avia.csv'
+        df_avia_pa_relevant.to_csv(df_avia_path)
+
     elif i == 6:
-        print(filepath[i]+': ZACHOS')
+        # print(filepath[i]+': ZACHOS')
         sheet_name = 'fossil_CO2_by_sector_country_su'  # Replace with the actual sheet name
         df_edgar = pd.read_excel(filepath[i], sheet_name=sheet_name)
         df_edgar = df_edgar.iloc[1450:1458,51:57]
@@ -135,7 +131,7 @@ for i in range(len(filepath)):
         df_edgar_relevant = df_edgar_relevant.rename({
             df_edgar_relevant.columns[0]:'CO2_sum', df_edgar_relevant.columns[1]:'C02_normalized'
         },axis='columns')
-        print(df_edgar_relevant)
+        # print(df_edgar_relevant)
         
         #Pre-Processing if we use emissions per category (normalized): 
         df_edgar_categories = pd.read_excel(filepath[i], sheet_name=sheet_name)
@@ -148,10 +144,12 @@ for i in range(len(filepath)):
                               "Industrial Combustion", "Power Industry", "Processes","Transport", "Waste"
                              ] 
         df_edgar_categories_norm.index = custom_index_names
-        print(df_edgar_categories_norm)
+        # print(df_edgar_categories_norm)
+        df_emissions_path = pydir + '\\DATA_PROCESSED\\df_emissions.csv'
+        df_edgar_relevant.to_csv(df_emissions_path)
         
     elif i == 7:
-        print(filepath[i]+': VASILIS')
+        # print(filepath[i]+': VASILIS')
         
         # Read CSV file
         df_cargo = pd.read_csv(filepath[i])
@@ -188,7 +186,9 @@ for i in range(len(filepath)):
         df_cargo = df_cargo.groupby(["Time-period", "Country"])["Cargo [tons]"].sum().unstack()
 
         # Print the processed table
-        print(df_cargo.head())
+        # print(df_cargo.head())
+        df_cargo_path = pydir + '\\DATA_PROCESSED\\df_cargo_mar.csv'
+        df_cargo.to_csv(df_cargo_path)
 
     elif i == 8:
         # print(filepath[i]+': PIOTR PIETRZAK')
@@ -268,7 +268,9 @@ for i in range(len(filepath)):
                                            in df_mar_pa_relevant.itertuples(index=False)]
 
         # print(df_mar_pa_relevant)
-        
+        df_mar_path = pydir + '\\DATA_PROCESSED\\df_passengers_mar.csv'
+        df_mar_pa_relevant.to_csv(df_mar_path)
+
     elif i == 9:
         # print(filepath[i]+': PIOTR PIETRZAK')
         # passenger count in thousands of passengers, from 2004
@@ -311,3 +313,5 @@ for i in range(len(filepath)):
                                            in df_rail_pa_relevant.itertuples(index=False)]
 
         # print(df_rail_pa_relevant)
+        df_rail_path = pydir + '\\DATA_PROCESSED\\df_passengers_rail.csv'
+        df_rail_pa_relevant.to_csv(df_rail_path)
