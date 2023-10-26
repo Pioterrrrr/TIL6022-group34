@@ -78,6 +78,12 @@ for i in range(len(filepath)):
         # print(co2)
         # print(time)
         # print(co2_tot)
+        df_co2_path = pydir + '\\DATA_PROCESSED\\df_ship_co2.csv'
+        co2.to_csv(df_co2_path)
+        df_time_path = pydir + '\\DATA_PROCESSED\\df_ship_time.csv'
+        time.to_csv(df_time_path)
+        df_co2tot_path = pydir + '\\DATA_PROCESSED\\df_ship_co2_total.csv'
+        co2_tot.to_csv(df_co2tot_path)
 
     elif i == 5:
         # print(filepath[i]+': PIOTR PIETRZAK')
