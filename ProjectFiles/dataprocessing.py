@@ -17,6 +17,7 @@ for file in datalist:
 # print(filepath)
 
 data_5 = pd.DataFrame()  # combined data 1-5
+pd.set_option('display.max_columns', None)
 
 for i in range(len(filepath)):
     if i == 0:
@@ -44,8 +45,9 @@ for i in range(len(filepath)):
         co2_tot = data_5.groupby([data_5.columns[1]])[data_5.columns[2]].agg(
             ['sum', 'count']).reset_index()
         co2_tot = co2_tot.rename(columns={'sum': 'CO2_sum', 'count': 'Element_count'})
+        co2_tot['CO2 sum [Mt]'] = co2_tot['CO2_sum'] / (1000000)
         co2_tot['CO2 per ship [t]'] = co2_tot['CO2_sum'] / co2_tot['Element_count']
-        co2_tot = co2_tot.iloc[:, [0, 3]]
+        co2_tot = co2_tot.iloc[:, [0, 3, 4]]
 
         # group ship by ship type and reported year +  sum of co2 [tons]
         co2 = data_5.groupby([data_5.columns[0], data_5.columns[1]])[data_5.columns[2]].agg(
