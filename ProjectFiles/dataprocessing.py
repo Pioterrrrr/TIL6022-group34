@@ -279,15 +279,16 @@ for i in range(len(filepath)):
 
     elif i == 9:
         # print(filepath[i]+': PIOTR PIETRZAK')
-        # passenger count in thousands of passengers, from 2004
+        # TWO UNITS: millions of km travelled and passenger count in thousands of passengers, from 2004
         # the dataframe is loaded
         df_rail_pa = pd.read_csv(filepath[i])
 
         # rail_countries stores all country codes present in the dataframe
         rail_countries = list(df_rail_pa['geo'].unique())
 
-        # selecting the relevant columns with time period, country and passenger count
-        df_rail_pa_relevant = df_rail_pa.iloc[:, 4:7]
+        # selecting the proper unit (thousands of passengers) and relevant columns with time period,
+        # country and passenger count
+        df_rail_pa_relevant = df_rail_pa[df_rail_pa['unit']=='THS_PAS'].iloc[:, 4:7]
 
         # here, the column names are renamed into names i prefer
         df_rail_pa_relevant = df_rail_pa_relevant.rename({
@@ -297,9 +298,9 @@ for i in range(len(filepath)):
         # this piece of code removes AT, BE and all coupled EU data because they are missing data either entirely,
         # or in key time ranges
         df_rail_pa_relevant = df_rail_pa_relevant.drop(
-            df_rail_pa_relevant[df_rail_pa_relevant['Geo'].str.startswith(tuple(['AT', 'BA', 'EU27_2007', 'BE', 'EU28', 'EU27_2020']))].index
+            df_rail_pa_relevant[df_rail_pa_relevant['Geo'].str.startswith(tuple(['AT', 'BA', 'RS', 'EU27_2007', 'BE', 'EU28', 'EU27_2020']))].index
         ).reset_index(drop=True)
-        rail_countries = [elm for elm in rail_countries if elm not in {'AT', 'BA', 'EU27_2007', 'BE', 'EU28', 'EU27_2020'}]
+        rail_countries = [elm for elm in rail_countries if elm not in {'AT', 'RS', 'BA', 'EU27_2007', 'BE', 'EU28', 'EU27_2020'}]
 
         # this piece of code multiplies all passenger counts by 1000, so that the unit is 1 instead of 1000
         df_rail_pa_relevant['Passengers_count'] *= 1000
@@ -325,6 +326,5 @@ for i in range(len(filepath)):
                                            for df_country, df_time, df_passengers
                                            in df_rail_pa_relevant.itertuples(index=False)]
 
-        # print(df_rail_pa_relevant)
         df_rail_path = pydir + '\\DATA_PROCESSED\\df_passengers_rail.csv'
         df_rail_pa_relevant.to_csv(df_rail_path)
