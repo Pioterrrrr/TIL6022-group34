@@ -294,6 +294,13 @@ for i in range(len(filepath)):
             'geo': 'Geo', 'TIME_PERIOD': 'Time_period', 'OBS_VALUE': 'Passengers_count'
         }, axis='columns')
 
+        # this piece of code removes AT, BE and all coupled EU data because they are missing data either entirely,
+        # or in key time ranges
+        df_rail_pa_relevant = df_rail_pa_relevant.drop(
+            df_rail_pa_relevant[df_rail_pa_relevant['Geo'].str.startswith(tuple(['AT', 'BA', 'EU27_2007', 'BE', 'EU28', 'EU27_2020']))].index
+        ).reset_index(drop=True)
+        rail_countries = [elm for elm in rail_countries if elm not in {'AT', 'BA', 'EU27_2007', 'BE', 'EU28', 'EU27_2020'}]
+
         # this piece of code multiplies all passenger counts by 1000, so that the unit is 1 instead of 1000
         df_rail_pa_relevant['Passengers_count'] *= 1000
 
