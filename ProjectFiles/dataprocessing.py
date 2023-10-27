@@ -10,6 +10,7 @@ datalist = os.listdir(datadir)
 filepath = []
 
 warnings.filterwarnings("ignore", message="Workbook contains no default style, apply openpyxl's default")
+pd.set_option('display.max_columns', None)
 
 for file in datalist:
     filepath.append(pydir + '\\data\\' + file)
@@ -17,7 +18,6 @@ for file in datalist:
 # print(filepath)
 
 data_5 = pd.DataFrame()  # combined data 1-5
-pd.set_option('display.max_columns', None)
 
 for i in range(len(filepath)):
     if i == 0:
@@ -53,39 +53,94 @@ for i in range(len(filepath)):
         co2 = data_5.groupby([data_5.columns[0], data_5.columns[1]])[data_5.columns[2]].agg(
             ['sum', 'count']).reset_index()
         # group ship by ship type and reported year +  sum of time at sea [hours]
-        time = data_5.groupby([data_5.columns[0], data_5.columns[1]])[data_5.columns[3]].agg(
-            ['sum', 'count']).reset_index()
+        # time = data_5.groupby([data_5.columns[0], data_5.columns[1]])[data_5.columns[3]].agg(
+            #['sum', 'count']).reset_index()
 
         # rename columns including new elements
         co2 = co2.rename(columns={'sum': 'CO2_sum', 'count': 'Element_count'})
-        time = time.rename(columns={'sum': 'Time_sum', 'count': 'Element_count'})
+        # time = time.rename(columns={'sum': 'Time_sum', 'count': 'Element_count'})
 
         # calcualtions of the average co2 emission and time at sea per ship category (considering the availbale ship data each year)
         co2['CO2 per ship [t]'] = co2['CO2_sum'] / co2['Element_count']
-        time['Time at sea per ship [hours]'] = time['Time_sum'] / time['Element_count']
+        # time['Time at sea per ship [hours]'] = time['Time_sum'] / time['Element_count']
 
         # delete of not relevant ship category
         ship_type = ['Passenger ship', 'Container ship', 'Bulk carrier', 'LNG carrier', 'Oil tanker']
         co2 = co2[co2[co2.columns[0]].isin(ship_type)]
-        time = time[time[time.columns[0]].isin(ship_type)]
+        # time = time[time[time.columns[0]].isin(ship_type)]
+
 
         # new dataset with only relevant data (co2 emission and time at sea per ship per year)
+        co2_final = co2.iloc[:, [0, 1, 2]]
         co2 = co2.iloc[:, [0, 1, 4]]
-        time = time.iloc[:, [0, 1, 4]]
+        # time = time.iloc[:, [0, 1, 4]]
 
-        # building table
-        co2 = co2.pivot(index=co2.columns[0], columns=co2.columns[1], values=co2.columns[2])
-        time = time.pivot(index=time.columns[0], columns=time.columns[1], values=time.columns[2])
 
-        # print(co2)
-        # print(time)
+        ship_type_data = {}
+        # List of relevant ship types
+        relevant_ship_types = ['Passenger ship', 'Container ship', 'Bulk carrier', 'LNG carrier', 'Oil tanker']
+        for ship_type in relevant_ship_types:
+            # Filter data for the specific ship type
+            ship_type_df = co2[co2['Ship type'] == ship_type]
+            # Pivot the ship type data
+            ship_type_pivot = ship_type_df.pivot(index='Reporting Period', columns='Ship type',
+                                                 values='CO2 per ship [t]')
+            # Reset index to make 'Reporting Period' a column
+            ship_type_pivot = ship_type_pivot.reset_index()
+            # Store the pivoted data in the dictionary
+            ship_type_data[ship_type] = ship_type_pivot
+        # Merge the data for all ship types based on the 'Reporting Period'
+        merged_data = ship_type_data[relevant_ship_types[0]]
+        for ship_type in relevant_ship_types[1:]:
+            merged_data = pd.merge(merged_data, ship_type_data[ship_type], on='Reporting Period', how='outer')
+        # Set the 'Reporting Period' column as the index
+        merged_data = merged_data.set_index('Reporting Period')
+        # Reset the index to include 'Reporting Period' as a column
+        merged_data = merged_data.reset_index()
+        # Sort the DataFrame by 'Reporting Period'
+        co2 = merged_data.sort_values('Reporting Period')
+
+
+        ship_type_data = {}
+        # List of relevant ship types
+        relevant_ship_types = ['Passenger ship', 'Container ship', 'Bulk carrier', 'LNG carrier', 'Oil tanker']
+        for ship_type in relevant_ship_types:
+            # Filter data for the specific ship type
+            ship_type_df = co2_final[co2_final['Ship type'] == ship_type]
+            # Pivot the ship type data
+            ship_type_pivot = ship_type_df.pivot(index='Reporting Period', columns='Ship type',
+                                                 values='CO2_sum')
+            # Reset index to make 'Reporting Period' a column
+            ship_type_pivot = ship_type_pivot.reset_index()
+            # Store the pivoted data in the dictionary
+            ship_type_data[ship_type] = ship_type_pivot
+        # Merge the data for all ship types based on the 'Reporting Period'
+        merged_data = ship_type_data[relevant_ship_types[0]]
+        for ship_type in relevant_ship_types[1:]:
+            merged_data = pd.merge(merged_data, ship_type_data[ship_type], on='Reporting Period', how='outer')
+        # Set the 'Reporting Period' column as the index
+        merged_data = merged_data.set_index('Reporting Period')
+        # Reset the index to include 'Reporting Period' as a column
+        merged_data = merged_data.reset_index()
+        # Sort the DataFrame by 'Reporting Period'
+        co2_final = merged_data.sort_values('Reporting Period')
+
+        co2_final['Total Co2 emission [t]'] = co2_tot['CO2 sum [Mt]']*1000000
+        co2_final['Other ships'] = (co2_final['Total Co2 emission [t]'] - co2_final['Bulk carrier']
+                                    - co2_final['Container ship'] - co2_final['Passenger ship'] - co2_final['Oil tanker']
+                                    - co2_final['LNG carrier'])
+        co2_final = co2_final.iloc[:, [0, 1, 2, 3, 4, 5, 7]]
+        print(co2_final)
+
         # print(co2_tot)
         df_co2_path = pydir + '\\DATA_PROCESSED\\df_ship_co2.csv'
         co2.to_csv(df_co2_path)
-        df_time_path = pydir + '\\DATA_PROCESSED\\df_ship_time.csv'
-        time.to_csv(df_time_path)
+        #df_time_path = pydir + '\\DATA_PROCESSED\\df_ship_time.csv'
+        #time.to_csv(df_time_path)
         df_co2tot_path = pydir + '\\DATA_PROCESSED\\df_ship_co2_total.csv'
         co2_tot.to_csv(df_co2tot_path)
+        df_co2final_path = pydir + '\\DATA_PROCESSED\\df_ship_co2_final.csv'
+        co2_final.to_csv(df_co2final_path)
 
     elif i == 5:
         # print(filepath[i]+': PIOTR PIETRZAK')
