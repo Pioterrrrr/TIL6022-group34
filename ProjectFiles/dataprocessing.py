@@ -249,6 +249,25 @@ for i in range(len(filepath)):
         df_mar_pa_relevant = df_mar_pa_relevant.drop(df_mar_pa_relevant[df_mar_pa_relevant['Geo']=='BG'].index).reset_index(drop=True)
         mar_countries.remove('BG')
 
+        # BE and UK have stopped providing data to the dataset from 2020, and ME has inconsistent data with many
+        # quarters stating zero passengers. They are removed from Q3 of 2020 forward, so that they can still show up in
+        # the joint line graph, but do not interfere with passenger drop calculations
+        df_mar_pa_relevant = df_mar_pa_relevant.drop(
+            df_mar_pa_relevant[df_mar_pa_relevant['Geo'].str.startswith(
+                tuple(['BE', 'UK', 'ME'])) & df_mar_pa_relevant['Time_period'].str.startswith(tuple(['2020-Q3','2020-Q4','2021','2022','2023']))].index
+        ).reset_index(drop=True)
+        # FR and EU have zero passengers reported from 2022 and onward
+        df_mar_pa_relevant = df_mar_pa_relevant.drop(
+            df_mar_pa_relevant[df_mar_pa_relevant['Geo'].str.startswith(
+                tuple(['FR','EU'])) & df_mar_pa_relevant['Time_period'].str.startswith(
+                tuple(['2022', '2023']))].index
+        ).reset_index(drop=True)
+        # SE, NO, NL, DK and IT have zero passengers reported for 2023
+        df_mar_pa_relevant = df_mar_pa_relevant.drop(
+            df_mar_pa_relevant[df_mar_pa_relevant['Geo'].str.startswith(
+                tuple(['SE','NO','NL','DK','IT'])) & df_mar_pa_relevant['Time_period'].str.startswith('2023')].index
+        ).reset_index(drop=True)
+
         # this piece of code multiplies all passenger counts by 1000, so that the unit is 1 instead of 1000
         df_mar_pa_relevant['Passengers_count'] *= 1000
 
@@ -273,7 +292,6 @@ for i in range(len(filepath)):
                                            for df_country,df_time,df_passengers
                                            in df_mar_pa_relevant.itertuples(index=False)]
 
-        # print(df_mar_pa_relevant)
         df_mar_path = pydir + '\\DATA_PROCESSED\\df_passengers_mar.csv'
         df_mar_pa_relevant.to_csv(df_mar_path)
 
@@ -295,7 +313,7 @@ for i in range(len(filepath)):
             'geo': 'Geo', 'TIME_PERIOD': 'Time_period', 'OBS_VALUE': 'Passengers_count'
         }, axis='columns')
 
-        # this piece of code removes AT, BE and all coupled EU data because they are missing data either entirely,
+        # this piece of code removes AT, BA, RS, BE and all coupled EU data because they are missing data either entirely,
         # or in key time ranges
         df_rail_pa_relevant = df_rail_pa_relevant.drop(
             df_rail_pa_relevant[df_rail_pa_relevant['Geo'].str.startswith(tuple(['AT', 'BA', 'RS', 'EU27_2007', 'BE', 'EU28', 'EU27_2020']))].index
