@@ -267,6 +267,11 @@ for i in range(len(filepath)):
             df_mar_pa_relevant[df_mar_pa_relevant['Geo'].str.startswith(
                 tuple(['SE','NO','NL','DK','IT'])) & df_mar_pa_relevant['Time_period'].str.startswith('2023')].index
         ).reset_index(drop=True)
+        # FI has zero passengers reported for q2 of 2023 and im plotting them later
+        df_mar_pa_relevant = df_mar_pa_relevant.drop(
+            df_mar_pa_relevant[df_mar_pa_relevant['Geo'].str.startswith(
+                tuple(['FI'])) & df_mar_pa_relevant['Time_period'].str.startswith('2023-Q2')].index
+        ).reset_index(drop=True)
 
         # this piece of code multiplies all passenger counts by 1000, so that the unit is 1 instead of 1000
         df_mar_pa_relevant['Passengers_count'] *= 1000
